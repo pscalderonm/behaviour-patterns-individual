@@ -27,6 +27,100 @@ apague cambiará su estado al de Apagado.
 
 #### Solucion del problema
 
+Para empezar, se requiere crear un nuevo estado "intermedio" que valide dos cosas antes de establecer el estado final de `StopServerState`
+
+1. Debe validar de que no existan mensajes pendientes de ser "procesados"
+2. No debe permitir manejar mas mensajes mientra esté en este estado
+
+La clase con el nuevo estado intermedio es la `SafeStopServerState`
+
+``` java
+public SafeStopServerState(final Server server){
+
+    public SafeStopServerState(final Server server){
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Server is stopping...");
+                try {
+                    while (true) {
+                        if (server.getMessageProcess().countMessage() <= 0) {
+                            server.setState(new StopServerState(server));
+                            break;
+                        }
+                        Thread.sleep(250);
+                    }
+                    System.out.println("Server stopped");
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void handleMessage(Server server, String message) {
+        System.out.println("Server is stopping, it can not process any more message");
+    }
+}
+```
+
+Luego de ello y para tener control durante la fase de cambio de estados en el objeto `Server`, se agrega una validación mas para evitar cambiar a otro estado mientras se está en el estado `SafeStopServerState`
+
+``` java
+public void setState(AbstractServerState state) {
+    ...
+    if(this.state instanceof SafeStopServerState && 
+            !(state instanceof StopServerState)) {
+        System.out.println("Server is stopping, " +
+                "cannot chance state");
+
+        return;
+    }
+
+    this.state = state;
+    System.out.println("Server change state > " + 
+            this.state.getClass().getSimpleName());
+}
+```
+
+Por último, y a modo de forzar la validación anterior cuando se hace clic sobre el botón principal, mientras se está en el estado de **Cierre Seguro**
+
+``` java
+AbstractServerState state = server.getState();
+        if (state instanceof StopServerState) {
+            btnStart.setText("Stop");
+            server.setState(new StartingServerState(server));
+        } else {
+            if (state instanceof StartingServerState) {
+                server.setState(new StopServerState(server));
+            //Here we force to apply validation rule within the server 
+            } else if (state instanceof SafeStopServerState){
+                server.setState(new StartServerState(server));
+            }
+            
+            else {
+                btnStart.setText("Start");
+                server.setState(new SafeStopServerState(server));
+            }
+        }
+```
+
+#### Resultados obtenidos
+
+Luego de aplicados los cambios y de correr el proyecto, se obtiene lo siguiente
+
+![](resources/state-pattern-result.png)
+
+Se pueden notar algunas cosas:
+1. Cuando el servidor se inicia, se empieza a enviar algunos mensajes (3 en la imagen)
+2. Se manda a apagar el servidor, el cual entra en el estado `SafeStopServerState`
+3. Mientras el sevidor es esta apagando, se intenta enviar mas mensajes, a lo que el servidor responde inmediatamente con `Server is stopping, it can not process any more message`
+4. Al mismo tiempo, se intenta ejecutar la acción `Start`, a lo cual el servidor responde con `Server is stopping, cannot chance state`
+5. Luego de que todos los mensajes son procesados, el servidor pasa directamente al estado de `StopServerState`
+
+De esta manera, se evidencia la ejecución del nuevo estado para el Apagado seguro del ejemplo.
 
 ## Patrón Observable
 

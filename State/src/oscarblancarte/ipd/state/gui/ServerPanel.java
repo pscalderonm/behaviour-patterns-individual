@@ -3,9 +3,7 @@ package oscarblancarte.ipd.state.gui;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import oscarblancarte.ipd.state.Server;
-import oscarblancarte.ipd.state.states.AbstractServerState;
-import oscarblancarte.ipd.state.states.StartingServerState;
-import oscarblancarte.ipd.state.states.StopServerState;
+import oscarblancarte.ipd.state.states.*;
 
 public class ServerPanel extends javax.swing.JPanel {
 
@@ -133,9 +131,12 @@ public class ServerPanel extends javax.swing.JPanel {
         } else {
             if (state instanceof StartingServerState) {
                 server.setState(new StopServerState(server));
-            } else {
+            } else if (state instanceof SafeStopServerState){
+                server.setState(new StartServerState(server));
+            }
+            else {
                 btnStart.setText("Start");
-                server.setState(new StopServerState(server));
+                server.setState(new SafeStopServerState(server));
             }
         }
         

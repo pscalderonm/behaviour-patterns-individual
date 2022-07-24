@@ -5,24 +5,7 @@ import oscarblancarte.ipd.state.Server;
 public class StopServerState extends AbstractServerState {
 
     public StopServerState(final Server server){
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try{
-
-                    while(server.getMessageProcess().countMessage() > 0){
-                        Thread.sleep(1000);
-                    }
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-
-                server.getMessageProcess().stop();
-            }
-        });
-
-
+        server.getMessageProcess().stop();
     }
     
     @Override
