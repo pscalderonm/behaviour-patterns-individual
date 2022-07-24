@@ -112,6 +112,8 @@ deberán tener las reglas ya conocidas.
 
 #### Solución al problema
 
+>**NOTA: Cambiar la referencia al path en donde se encuentran los archivos para correr la prueba. Así mismo tener creado los directorios logs y process para que el proceso genere los logs y mueva los archivos ya procesados** 
+
 Para llevar a cabo esta tarea, fue necesario desarrollar dos clases de ayuda, una de tipo Factory para obtener el objeto que permite la lectura del XML y otra para poder generar el archivo de logs en el mismo formato XML.
 
 La clase para generar el objeto que permitirá leer y escribir el XML
