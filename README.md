@@ -35,7 +35,7 @@ Para empezar, se requiere crear un nuevo estado "intermedio" que valide dos cosa
 La clase con el nuevo estado intermedio es la `SafeStopServerState`
 
 ``` java
-public SafeStopServerState(final Server server){
+public class SafeStopServerState extends AbstractServerState {
 
     public SafeStopServerState(final Server server){
 
