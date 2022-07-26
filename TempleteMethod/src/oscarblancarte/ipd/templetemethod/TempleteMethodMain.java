@@ -19,7 +19,8 @@ public class TempleteMethodMain extends TimerTask {
 //    private static final String LOG_DIR = "C:/files/logs";
 //    private static final String PROCESS_DIR = "C:/files/process";
 
-    private static final String MAIN_PATH="/home/projector-user/files";
+
+    private static final String MAIN_PATH= String.format("%s/TempleteMethod/test-files",  System.getProperty("user.dir"));
     private static final String[] PATHS =
             new String[]{
                     MAIN_PATH+"/drugstore",
